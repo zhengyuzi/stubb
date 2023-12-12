@@ -1,4 +1,7 @@
-# STUBB
+# stubb
+
+![npm](https://img.shields.io/npm/v/stubb)
+![NPM](https://img.shields.io/npm/l/stubb)
 
 Generate 'dist' during the development process to forward the package's entry file.
 
@@ -13,7 +16,6 @@ npm install --save-dev stubb
 ### In the 'package.json' of the package in need:
 ```json
 {
-  // ...
   "scripts": {
     "stubb": "stubb"
   }
