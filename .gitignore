@@ -1,0 +1,12 @@
+# output
+dist
+
+# IDE
+.vscode/settings.json
+
+# Dependencies
+node_modules
+
+# Logs
+/logs
+*.log

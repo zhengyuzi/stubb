@@ -1,0 +1,73 @@
+{
+  "name": "stubb",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Generate 'dist' during the development process to forward the package's entry file",
+  "author": "yu <381740310@qq.com> (https://github.com/zhengyuzi)",
+  "license": "MIT",
+  "homepage": "https://github.com/zhengyuzi/stubb",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zhengyuzi/stubb"
+  },
+  "bugs": {
+    "url": "https://github.com/zhengyuzi/stubb/issues"
+  },
+  "keywords": [
+    "stub",
+    "entry",
+    "packages",
+    "dist",
+    "development"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "stubb": "bin/stubb.js"
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "scripts": {
+    "stub": "unbuild --stub",
+    "stubb": "rimraf playground/*/dist --glob && pnpm -r --filter=./playground/* run stubb",
+    "build": "unbuild",
+    "lint": "eslint .",
+    "lint:fix": "pnpm lint --fix",
+    "prepare": "simple-git-hooks"
+  },
+  "dependencies": {
+    "cac": "^6.7.14",
+    "fast-glob": "^3.3.2",
+    "fs-extra": "^11.2.0",
+    "path-parse": "^1.0.7"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^2.3.4",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.10.3",
+    "@types/path-parse": "^1.0.22",
+    "eslint": "^8.55.0",
+    "esno": "^4.0.0",
+    "lint-staged": "^15.2.0",
+    "rimraf": "^5.0.5",
+    "simple-git-hooks": "^2.9.0",
+    "typescript": "^5.3.3",
+    "unbuild": "^2.0.0"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*": "eslint --fix"
+  }
+}
