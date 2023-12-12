@@ -2,6 +2,7 @@
   "name": "stubb",
   "type": "module",
   "version": "1.0.0",
+  "packageManager": "pnpm@8.12.0",
   "description": "Generate 'dist' during the development process to forward the package's entry file",
   "author": "yu <381740310@qq.com> (https://github.com/zhengyuzi)",
   "license": "MIT",
