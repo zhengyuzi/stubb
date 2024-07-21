@@ -1,0 +1,77 @@
+{
+  "name": "stubb",
+  "type": "module",
+  "version": "1.0.0",
+  "packageManager": "pnpm@9.0.5",
+  "description": "Stub 'dist' link your project based on package.json during the development",
+  "author": "yu <381740310@qq.com> (https://github.com/zhengyuzi)",
+  "license": "MIT",
+  "homepage": "https://github.com/zhengyuzi/stubb",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zhengyuzi/stubb"
+  },
+  "bugs": {
+    "url": "https://github.com/zhengyuzi/stubb/issues"
+  },
+  "keywords": [
+    "stub",
+    "entry",
+    "packages",
+    "dist",
+    "development",
+    "monorepo"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "stubb": "bin/stubb.js"
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "scripts": {
+    "stub": "unbuild --stub",
+    "stubb": "rimraf examples/*/dist --glob && pnpm -r --filter=./examples/* run stubb",
+    "build": "unbuild",
+    "lint": "eslint .",
+    "lint:fix": "pnpm lint --fix",
+    "prepare": "simple-git-hooks"
+  },
+  "dependencies": {
+    "fast-glob": "^3.3.2",
+    "fs-extra": "^11.2.0",
+    "mlly": "^1.7.1"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^2.21.3",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.10.3",
+    "eslint": "^9.6.0",
+    "esno": "^4.0.0",
+    "lint-staged": "^15.2.0",
+    "rimraf": "^5.0.5",
+    "simple-git-hooks": "^2.9.0",
+    "typescript": "^5.3.3",
+    "unbuild": "^2.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*": "eslint --fix"
+  }
+}
