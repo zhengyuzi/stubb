@@ -27,7 +27,7 @@ export async function stub() {
       }
 
       for (const [key, value] of Object.entries(_export)) {
-        if (key === 'entry')
+        if (key === 'entry' || !value)
           continue
 
         fs.outputFile(resolve(value), String(data[key as keyof typeof data]))
@@ -60,19 +60,10 @@ async function readPackageJson() {
       },
     ] as PackageJsonExport[]
   }
-  /**
-   * All default. no 'exports'/'main/'module'/'types'.
-   */
   else {
-    const { output, entryName, ext } = StubbDefaultConfig
-
-    return [
-      {
-        import: `./${output}/${entryName}.${ext.import}`,
-        require: `./${output}/${entryName}.${ext.require}`,
-        types: `./${output}/${entryName}.${ext.types}`,
-      },
-    ] as PackageJsonExport[]
+    // eslint-disable-next-line no-console
+    console.log(`WARNING: Not set exports/main/module/types\n at ${resolve('./package.json')}`)
+    return []
   }
 }
 
@@ -88,7 +79,7 @@ async function getEntryPath(entry: string) {
   const exists = await fs.pathExists(entryPath)
 
   if (!exists) {
-    throw new Error(`✘ The entry file 【${entryPath}】 does not exist. To set the correct entry path!`)
+    throw new Error(`ERROR: The entry file 【${entryPath}】 does not exist. To set the correct entry path!`)
   }
 
   return path
