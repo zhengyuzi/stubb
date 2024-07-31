@@ -1,7 +1,7 @@
 {
   "name": "stubb",
   "type": "module",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "packageManager": "pnpm@9.0.5",
   "description": "Stub 'dist' link your project based on package.json during the development",
   "author": "yu <381740310@qq.com> (https://github.com/zhengyuzi)",
