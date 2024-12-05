@@ -32,8 +32,6 @@ Default project structure:
         |-- index.cjs
         |-- index.mjs
         |-- index.d.ts
-        |-- index.d.mts
-        |-- index.d.cts
     |-- src/
         |-- index.ts
     |-- package.json
