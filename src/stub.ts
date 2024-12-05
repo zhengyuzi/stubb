@@ -1,117 +1,107 @@
-import process from 'node:process'
 import { resolve } from 'node:path'
-import fs from 'fs-extra'
+import process from 'node:process'
 import fg from 'fast-glob'
+import fs from 'fs-extra'
+import pathParse from 'path-parse'
 import { resolveModuleExportNames } from 'mlly'
-import { ExitCode, StubbDefaultConfig } from './constants'
-import type { PackageJsonExport } from './types'
+import consola from 'consola'
+import { EXIT_CODE, EXPORT_CONTENT, OUTPUT_SUFFIXES } from './constants'
 
-export async function stub() {
-  process.on('uncaughtException', error => errorHandler(`${error}`))
-  process.on('unhandledRejection', reason => errorHandler(`${reason}`))
+/**
+ * Stub
+ * @param entries Entry file paths.
+ * @param outputDir The folder name/path of the output file.
+ * @param outputSuffixes ESM/CJS/TS file suffixes.
+ */
+export async function stub(
+  entries: string[],
+  outputDir: string,
+  outputSuffixes: Partial<typeof OUTPUT_SUFFIXES> = OUTPUT_SUFFIXES,
+) {
+  // Path to the output file folder
+  const outputDirPath = resolve(outputDir)
 
   try {
-    const exports = await readPackageJson()
+    for (const entry of entries) {
+      // Path to the entry file
+      const entryPath = await findEntryPath(entry)
+      // Does the path exist
+      const psthExists = await fs.pathExists(entryPath)
 
-    for (const _export of exports) {
-      const path = await getEntryPath(_export.entry || StubbDefaultConfig.entry)
-
-      const hasDefaultExport = await resolveDefaultExport(path)
-
-      const _path = path.replace(/\\/g, '/')
-
-      const data = {
-        import: [`export * from '${_path}'`, hasDefaultExport ? `export { default } from '${_path}'` : ''].join('\n'),
-        require: `module.exports = require('${_path}')`,
-        types: [`export * from '${_path}'`, hasDefaultExport ? `export { default } from '${_path}'` : ''].join('\n'),
+      if (!psthExists) {
+        throw new Error(`The entry file ${entryPath} does not exist.`)
       }
 
-      for (const [key, value] of Object.entries(_export)) {
-        if (key === 'entry' || !value)
-          continue
+      const { name } = pathParse(entryPath)
 
-        fs.outputFile(resolve(value), String(data[key as keyof typeof data]))
+      const data = await getStubData(entryPath)
+
+      for (const [key, suffixes] of Object.entries(outputSuffixes)) {
+        const fileData = data[key as keyof typeof data]
+
+        for (const suffix of suffixes) {
+          // Output file path
+          const ouputPath = resolve(`${outputDirPath}/${name}${suffix}`)
+
+          // Write and output file
+          await fs.outputFile(ouputPath, fileData).catch((error) => {
+            throw new Error(`Failed to output file to ${ouputPath}: ${error}`)
+          })
+        }
       }
     }
-  }
-  catch (error) {
-    errorHandler((error as Error).message)
-  }
-}
 
-/**
- * Read package.json
- */
-async function readPackageJson() {
-  const { exports, main, module, types } = await fs.readJson('./package.json')
-
-  /**
-   * 'exports' have higher priority than 'main', 'module', and 'types'
-   */
-  if (exports) {
-    return Object.values(exports) as PackageJsonExport[]
+    consola.success(`Stub success! ${outputDirPath}`)
   }
-  else if (main || module || types) {
-    return [
-      {
-        import: module,
-        require: main,
-        types,
-      },
-    ] as PackageJsonExport[]
-  }
-  else {
-    // eslint-disable-next-line no-console
-    console.log(`WARNING: Not set exports/main/module/types\n at ${resolve('./package.json')}`)
-    return []
+  catch (error: any) {
+    consola.error(`Stub Fail! Error: ${error.message}\nat ${outputDirPath}`)
+    process.exit(EXIT_CODE.fatalException)
   }
 }
 
 /**
- * Retrieve the export name of the entry file
- * @param entry
+ * Get stub export content
  */
-async function getEntryPath(entry: string) {
-  const entryPath = await findEntryFilePath(entry)
+async function getStubData(entryPath: string): Promise<{ [key in keyof typeof OUTPUT_SUFFIXES]: string }> {
+  const isDefaultExport = await resolveDefaultExport(entryPath)
 
-  const path = resolve(entryPath)
+  const path = entryPath.replace(/\\/g, '/')
 
-  const exists = await fs.pathExists(entryPath)
+  const esm = `${EXPORT_CONTENT.namedExport}\n${isDefaultExport ? EXPORT_CONTENT.defaultExport : ''}`.replaceAll('path', path)
 
-  if (!exists) {
-    throw new Error(`ERROR: The entry file 【${entryPath}】 does not exist. To set the correct entry path!`)
+  const cjs = EXPORT_CONTENT.moduleExport.replaceAll('path', path)
+
+  return {
+    cjs,
+    esm,
+    ts: esm,
   }
-
-  return path
 }
 
 /**
- * Determine whether it is a default export, otherwise it is a named export
- * @param filePath
- * @returns boolean
+ * Is the default export or named export
+ * @param path
+ * @returns Promise<boolean>
  */
-async function resolveDefaultExport(filePath: string) {
+async function resolveDefaultExport(path: string) {
   const namedExports: string[] = await resolveModuleExportNames(
-    filePath,
+    path,
     {
-      extensions: ['.ts', '.js'],
+      extensions: ['.ts', '.mts', '.cts', '.js', '.mjs', '.cjs'],
     },
-  ).catch((error) => {
-    errorHandler(`Cannot analyze ${filePath} for exports:${error}`)
-    return []
-  })
+  )
 
   return namedExports.includes('default') || namedExports.length === 0
 }
 
 /**
- * Handling paths without ext
+ * Find the entry file path
  * @param entry
  * @returns Promise<string>
  */
-async function findEntryFilePath(entry: string) {
+async function findEntryPath(entry: string) {
   const files = await fg.glob(
-    `${entry}.+(ts|js)`,
+    `${entry}.+(ts|mts|cts|js|mjs|cjs)`,
     {
       onlyFiles: true,
       deep: 1,
@@ -120,10 +110,5 @@ async function findEntryFilePath(entry: string) {
     },
   )
 
-  return files[0] || entry
-}
-
-function errorHandler(message: string) {
-  console.error(message)
-  process.exit(ExitCode.FatalException)
+  return resolve(files[0] || entry)
 }

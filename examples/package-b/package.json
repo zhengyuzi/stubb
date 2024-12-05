@@ -1,9 +1,12 @@
 {
   "name": "package-b",
+  "exports": {
+    ".": {
+      "default": "./dist/index.cjs"
+    }
+  },
   "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
   "scripts": {
-    "stubb": "esno ../../bin/stubb.js"
+    "stubb": "esno ../../bin/stubb.js --esm=false --ts=false --fill"
   }
 }

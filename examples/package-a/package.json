@@ -4,20 +4,18 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "entry": "./test/index.ts"
+      "require": "./dist/index.cjs"
     },
     "./plugins": {
       "types": "./dist/plugins.d.ts",
       "import": "./dist/plugins.mjs",
-      "require": "./dist/plugins.cjs",
-      "entry": "./test/plugins.ts"
+      "require": "./dist/plugins.cjs"
     }
   },
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "stubb": "esno ../../bin/stubb.js"
+    "stubb": "esno ../../bin/stubb.js test/index,test/plugins --fill"
   }
 }

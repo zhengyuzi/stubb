@@ -1,6 +1,16 @@
 {
   "name": "package-c",
+  "exports": {
+    ".": {
+      "types": "./ouput/index.d.ts",
+      "import": "./ouput/index.mjs",
+      "require": "./ouput/index.cjs"
+    }
+  },
+  "main": "ouput/index.cjs",
+  "module": "ouput/index.mjs",
+  "types": "ouput/index.d.ts",
   "scripts": {
-    "stubb": "esno ../../bin/stubb.js"
+    "stubb": "esno ../../bin/stubb.js --outputDir=ouput --fill"
   }
 }

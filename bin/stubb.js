@@ -1,3 +1,1 @@
-import stubb from '../dist/index.mjs'
-
-stubb()
+import '../dist/cli.mjs'

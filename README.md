@@ -3,7 +3,7 @@
 ![npm](https://img.shields.io/npm/v/stubb)
 ![NPM](https://img.shields.io/npm/l/stubb)
 
-Stub ```dist``` link your project based on ```package.json``` during the development.
+Stub ```dist``` link your project during the development.
 
 ## Install
 
@@ -13,76 +13,78 @@ npm install --save-dev stubb
 
 ## Usage
 
-In the 'package.json' of the package in need:
+In the ```package.json``` of the package in need:
 
 ```json
 {
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
   "scripts": {
     "stub": "stubb"
   }
 }
 ```
-
-Generate folders and files based on the ```main```, ```module```, ```types``` and ```exports``` in ```package.json```.
 
 Default project structure:
 
 ```
 |-- package
     |-- dist/
+        |-- index.js
         |-- index.cjs
         |-- index.mjs
         |-- index.d.ts
+        |-- index.d.mts
+        |-- index.d.cts
     |-- src/
         |-- index.ts
     |-- package.json
 ```
 
-Add ```entry``` in the ```exports``` field to modify the entry file:
+## Options
+
+### entries
+
+Set one or more entry paths. Default: ```src/index```
 
 ```json
 {
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "entry": "./test/index.ts"
-    }
-  },
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
   "scripts": {
-    "stub": "stubb"
+    "stub": "stubb test/index,test/plugins"
   }
 }
 ```
 
-if exposing multiple entry points:
+### outputDir
+
+The folder name/path of the output file. Default: ```dist```
 
 ```json
 {
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    },
-    "./plugins": {
-      "types": "./dist/plugins.d.ts",
-      "import": "./dist/plugins.mjs",
-      "require": "./dist/plugins.cjs"
-    }
-  },
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
   "scripts": {
-    "stub": "stubb"
+    "stub": "stubb --outputDir=ouput"
   }
 }
 ```
+
+### fill
+
+Auto fill in exports/main/module/types in package.json. Default: ```false```
+
+```json
+{
+  "scripts": {
+    "stub": "stubb --fill"
+  }
+}
+```
+
+### esm
+
+Open esm. Default: ```true```
+
+### cjs
+
+Open cjs. Default: ```true```
+
+### ts
+
+Open types. Default: ```true```
