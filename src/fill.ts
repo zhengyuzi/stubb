@@ -2,7 +2,7 @@ import { resolve } from 'node:path'
 import pathParse from 'path-parse'
 import fs from 'fs-extra'
 import consola from 'consola'
-import { OUTPUT_SUFFIXES, SUFFIX_CJS, SUFFIX_MJS, SUFFIX_TS } from './constants'
+import { DEFAULT_FILENAME, OUTPUT_SUFFIXES, SUFFIX_CJS, SUFFIX_MJS, SUFFIX_TS } from './constants'
 
 export interface PackageExportFields {
   [key: string]: {
@@ -39,7 +39,11 @@ export async function fill(
   const dirPath = !dir.startsWith('.') && !dir.startsWith('/') ? `./${dir}` : dir
 
   for (const entry of entries) {
-    const { name } = pathParse(entry)
+    const entrySplit = entry.split('/')
+
+    const { name: filename } = pathParse(entry)
+
+    const name = entrySplit.length > 2 && filename === DEFAULT_FILENAME ? entrySplit[entrySplit.length - 2] : filename
 
     const exportName = name === 'index' ? '.' : `./${name}`
 

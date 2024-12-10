@@ -5,7 +5,7 @@ import fs from 'fs-extra'
 import pathParse from 'path-parse'
 import { resolveModuleExportNames } from 'mlly'
 import consola from 'consola'
-import { EXIT_CODE, EXPORT_CONTENT, OUTPUT_SUFFIXES } from './constants'
+import { DEFAULT_FILENAME, EXIT_CODE, EXPORT_CONTENT, OUTPUT_SUFFIXES } from './constants'
 
 /**
  * Stub
@@ -23,6 +23,7 @@ export async function stub(
 
   try {
     for (const entry of entries) {
+      const entrySplit = entry.split('/')
       // Path to the entry file
       const entryPath = await findEntryPath(entry)
       // Does the path exist
@@ -32,7 +33,13 @@ export async function stub(
         throw new Error(`The entry file ${entryPath} does not exist.`)
       }
 
-      const { name } = pathParse(entryPath)
+      const { name: filename } = pathParse(entryPath)
+
+      // src/index -> src/index
+      // src/file -> src/file
+      // src/dirname/index -> src/dirname
+      // src/dirname/file -> src/file
+      const name = entrySplit.length > 2 && filename === DEFAULT_FILENAME ? entrySplit[entrySplit.length - 2] : filename
 
       const data = await getStubData(entryPath)
 

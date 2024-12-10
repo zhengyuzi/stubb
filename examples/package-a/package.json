@@ -16,6 +16,6 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "stubb": "esno ../../bin/stubb.js test/index,test/plugins --fill"
+    "stubb": "esno ../../bin/stubb.js test/index,test/plugins/index --fill"
   }
 }

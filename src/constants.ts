@@ -1,4 +1,6 @@
-export const DEFAULT_ENTRY = 'src/index'
+export const DEFAULT_FILENAME = 'index'
+
+export const DEFAULT_ENTRY = `src/${DEFAULT_FILENAME}`
 
 export const DEFAULT_OUTPUT_DIR = 'dist'
 
